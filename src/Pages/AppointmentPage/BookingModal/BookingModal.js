@@ -1,4 +1,4 @@
-import React from 'react';
+import React , {useState} from 'react';
 import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
@@ -6,6 +6,7 @@ import Fade from '@mui/material/Fade';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { TextField } from '@mui/material';
+import useAuth from '../../../hooks/useAuth';
 
 const style = {
   position: 'absolute',
@@ -21,17 +22,58 @@ const style = {
 
 const BookingModal = ({openModal,modalClose,booking,date}) => {
     
-    const { name, time, space } = booking
+  
+  const { name, time } = booking
+  const { user } = useAuth();
+  const initialInfo = {displayName : user.displayName, email: user.email , phone : ''}
+  const [bookingInfo , setBookingInfo] = useState(initialInfo);
+
+
+  const handeleOnBlur = e => {
+    const field = e.target.name;
+    const value = e.target.value;
+    const newInfo = {...bookingInfo};
+    newInfo[field] = value;
+    setBookingInfo(newInfo);
+    
+    
+  }
+
+
+
+
 
     const BookingModalSubmit = e => {
-        alert('Submitting Success')
+      //  Collect Data 
+      const appoinment = {
+        ...bookingInfo,
+        time,
+        serviceName: name,
+        date:date.toLocaleDateString(),
+      }
+      ////// console.log(appoinment);
 
-        //  Collect Data  
-        // send to the Server 
+      // send to the Server 
+      fetch('http://localhost:5000/appointment', {
+        method: 'POST',
+        headers: {
+         'content-type' : 'application/json'
+        },
+        body: JSON.stringify(appoinment)
+      })
+        .then(res => res.json())
+        .then(data => {
+        console.log(data);
+      })
 
-        modalClose()
+      
+          modalClose();
         e.preventDefault();
-    }
+  }
+  
+  
+
+  
 
     return (
         <Modal
@@ -63,22 +105,26 @@ const BookingModal = ({openModal,modalClose,booking,date}) => {
                     <TextField
                         style={{ width: '90%',margin:'15px' }}
                         label="Name"
+                        onBlur={handeleOnBlur}
+                        name="displayName"
                         id="outlined-size-small"
-                        defaultValue='Name'
+                        defaultValue={user.displayName}
                         size="small"
                 />
                     <TextField
                         style={{ width: '90%',margin:'15px' }}
-                        label="Phone Number"
+                        name="phone"
+                        onBlur={handeleOnBlur}
                         id="outlined-size-small"
                         defaultValue='Phone Number'
                         size="small"
                 />
                     <TextField
                         style={{ width: '90%',margin:'15px' }}
-                        label="Emial"
+                        name="email"
+                        onBlur={handeleOnBlur}
                         id="outlined-size-small"
-                        defaultValue='Email '
+                        defaultValue={user.email}
                         size="small"
                 />
                     <TextField

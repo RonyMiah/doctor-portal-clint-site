@@ -11,6 +11,9 @@ import Home from './Pages/Home/Home/Home';
 import AppointmentPage from './Pages/AppointmentPage/AppointmentPage/AppointmentPage';
 import Login from './Pages/Login/Login/Login';
 import Register from './Pages/Login/Register/Register';
+import AuthProvider from './Contex/AuthProvider';
+import PrivateRoute from './Pages/Login/PrivateRoute/PrivateRoute';
+import Deshbord from './Pages/Deshbord/Deshbord/Deshbord';
 
 
 
@@ -18,6 +21,7 @@ import Register from './Pages/Login/Register/Register';
 function App() {
   return (
     <div className="App">
+      <AuthProvider>
       <Router>
         <Switch>
           <Route exact path="/">
@@ -35,11 +39,15 @@ function App() {
           <Route exact path="/login">
             <Login></Login>
           </Route>
-          <Route exact path="/appointment">
+          <PrivateRoute exact path="/appointment">
           <AppointmentPage></AppointmentPage>
-          </Route>
+          </PrivateRoute>
+          <PrivateRoute exact path="/dashboard">
+          <Deshbord></Deshbord>
+          </PrivateRoute>
         </Switch>
      </Router>
+      </AuthProvider>
     </div>
   );
 }
